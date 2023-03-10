@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Upload from "../Upload";
 import UploadKTP from "../Upload/uploadktp.js";
-import axios, { formToJSON } from "axios";
+
+import axios from "axios";
+import PostImage from "../PostImage/file";
 
 // const baseURL = "http://10.103.1.203:8082/backoffice/update_patient";
 
@@ -27,9 +29,11 @@ const Registration = () => {
   const [selectedCity, setSelectedCity] = useState(0);
   const [selectedDistrict, setSelectedDistrict] = useState(0);
   const [selectedVillage, setSelectedVillage] = useState(0);
-  // const [image, setImage] = useState("");
-  const [imagePreview, setImagePreview]= useState(null)
-  const [imagePreview2, setImagePreview2]= useState(null)
+  const [image, setImage] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview2, setImagePreview2] = useState(null);
+  const [imageString, setImageString]= useState(null);
+  
 
   const changeCardNumber = (e) => {
     const value = e.target.value;
@@ -86,38 +90,45 @@ const Registration = () => {
     setpatientPhoneNumber(value);
   };
 
-  // const changeIdImages = (e) => {
-  //   const value = e.target.files[0];
-  //   setpatientdataIdImages(value);
-  // };
-
-  // const changeProfile = (e) => {
-  //   const value = e.target.files[0];
-  //   ini knp gini?
-  //   setProfilePicture(value);
-  // };
+ 
 
   const getProvince = () => {
     return patientProvince.map((province, Id) => {
-      return <option key={Id} value={province.Id}>{province.Name}</option>;
+      return (
+        <option key={Id} value={province.Id}>
+          {province.Name}
+        </option>
+      );
     });
   };
 
   const getCity = () => {
     return patientCity.map((city, Id) => {
-      return <option key={Id} value={city.Id}>{city.Name}</option>;
+      return (
+        <option key={Id} value={city.Id}>
+          {city.Name}
+        </option>
+      );
     });
   };
 
   const getDistrict = () => {
     return patientDistrict.map((district, Id) => {
-      return <option key={Id} value={district.Id}>{district.Name}</option>;
+      return (
+        <option key={Id} value={district.Id}>
+          {district.Name}
+        </option>
+      );
     });
   };
 
   const getVillages = () => {
     return patientVillages.map((villages, Id) => {
-      return <option key={Id} value={villages.Id}>{villages.Name}</option>;
+      return (
+        <option key={Id} value={villages.Id}>
+          {villages.Name}
+        </option>
+      );
     });
   };
   const handleProvince = (e) => {
@@ -140,20 +151,41 @@ const Registration = () => {
     setSelectedVillage(e.target.value);
   };
 
-
   //pakenya yg ini
-  const uploadImage = (e)=>{
-    // const file = e.target.files[0]
-    const file = e.target.value
-    setpatientdataIdImages(file)
-    setImagePreview(URL.createObjectURL(file))
-  }
+  const uploadImage = (e) => {
+    const selectedImages = e.target.files[0];
+    let data ="";
+    let reader = new FileReader();
 
-  const uploadImageKTP = (e)=>{
-    const filees = e.target.value
-    setProfilePicture(filees)
-    setImagePreview2(URL.createObjectURL(filees))
-  }
+    reader.readAsDataURL(selectedImages);
+    
+    reader.onload = () => {
+      setImagePreview(URL.createObjectURL(selectedImages));
+      data = reader.result;
+      setImageString(data);
+    
+   
+    }
+    
+  };
+
+  const uploadImageKTP = (e) => {
+    const selectedImage= e.target.files[0]
+    setProfilePicture(selectedImage);
+    setImagePreview2(URL.createObjectURL(selectedImage));
+    let data ="";
+    let reader = new FileReader();
+
+    reader.readAsDataURL(selectedImage);
+    
+    reader.onload = () => {
+     
+      data = reader.result;
+      setImage(data);
+    
+   
+    }
+  };
 
   useEffect(() => {
     handleGetProvince();
@@ -176,10 +208,6 @@ const Registration = () => {
     });
   };
 
-  // disini harusnya bisa pake if.. coba aja
-  // jadi kyk misalnya yang ganti province.. dia akan ngehit api yang mana.. jadi ga kebanyakan useEffect
-  // Yang selected nanti dimasukin kesana.. itu gunanya, pada saat valuenya ganti dia akan panggil function diatasnya
-  //Lah uda gitu aja panduannya wkwkwk.. sebenernya yang handle function itu bisa 1 aja utk banyak function cuma gue lupa gimana buatnya
 
   const handleCity = () => {
     const urlCity =
@@ -217,7 +245,7 @@ const Registration = () => {
     });
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const data = {
       patientIDNumber: patientIDNumber,
@@ -235,40 +263,53 @@ const Registration = () => {
       patientDistrict: selectedDistrict,
       patientVillages: selectedVillage,
       patientdataIdImages: patientdataIdImages,
-      ProfilePicture: ProfilePicture,  
+      ProfilePicture: ProfilePicture,
     };
 
 
-console.log("ini", patientdataIdImages, ProfilePicture)
-    
-      var access_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDc3IiwiVXNlcmNvZGUiOiJVU1ItMDAwMDAxMDkwIiwiVXNlck5hbWUiOiJkaW5kYS5heXVAaW5kb2xhYi5jb20iLCJSb2xlcyI6W3siUm9sZUlkIjoiMSIsIlJvbGVOYW1lIjoiVVNFUiIsIlJvbGVEZXNjcmlwdGlvbiI6IkRlZmF1bHQgVXNlciIsIkJyYW5jaElEIjoiYWxsIn0seyJSb2xlSWQiOiIzIiwiUm9sZU5hbWUiOiJDQVNISUVSIiwiUm9sZURlc2NyaXB0aW9uIjoiQ2FzaGllclx0IiwiQnJhbmNoSUQiOiJJTkRPTEFCLVBJIn0seyJSb2xlSWQiOiI2IiwiUm9sZU5hbWUiOiJTQSIsIlJvbGVEZXNjcmlwdGlvbiI6IlN1cGVyIEFkbWluaXN0cmF0b3IiLCJCcmFuY2hJRCI6ImFsbCJ9XSwiVXNlckRhdGEiOnsiVXNlcklkIjoiMTA3NyIsIlVzZXJDb2RlIjoiVVNSLTAwMDAwMTA5MCIsIlVzZXJOYW1lIjoiZGluZGEuYXl1QGluZG9sYWIuY29tIn19.kGf0chPaEevbKFdnib_0rcs32bXS5qujSHRuq4jRk5k';
-      axios.post("http://10.103.1.203:8082/backoffice/update_patient", data, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`
-        }
-      }).then(res=>{
-        console.log("Selamat", res)
-      })
-      // const url =
-      //   "http://10.103.1.203:8082/backoffice/update_patient";
-      // axios.post(url, data).then((response) => {
-      //  console.log(response)
-      // });
- 
+ try {
+  let datas={
+    ImageString: imageString,
+    FileType: "Profile Picture"
+    }
+
+    let imagesData={
+      ImageString: imageString,
+      FileType: "IDI KTP"
+      }
+  let access_token =
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDc3IiwiVXNlcmNvZGUiOiJVU1ItMDAwMDAxMDkwIiwiVXNlck5hbWUiOiJkaW5kYS5heXVAaW5kb2xhYi5jb20iLCJSb2xlcyI6W3siUm9sZUlkIjoiMSIsIlJvbGVOYW1lIjoiVVNFUiIsIlJvbGVEZXNjcmlwdGlvbiI6IkRlZmF1bHQgVXNlciIsIkJyYW5jaElEIjoiYWxsIn0seyJSb2xlSWQiOiIzIiwiUm9sZU5hbWUiOiJDQVNISUVSIiwiUm9sZURlc2NyaXB0aW9uIjoiQ2FzaGllclx0IiwiQnJhbmNoSUQiOiJJTkRPTEFCLVBJIn0seyJSb2xlSWQiOiI2IiwiUm9sZU5hbWUiOiJTQSIsIlJvbGVEZXNjcmlwdGlvbiI6IlN1cGVyIEFkbWluaXN0cmF0b3IiLCJCcmFuY2hJRCI6ImFsbCJ9XSwiVXNlckRhdGEiOnsiVXNlcklkIjoiMTA3NyIsIlVzZXJDb2RlIjoiVVNSLTAwMDAwMTA5MCIsIlVzZXJOYW1lIjoiZGluZGEuYXl1QGluZG9sYWIuY29tIn19.kGf0chPaEevbKFdnib_0rcs32bXS5qujSHRuq4jRk5k";
+axios.defaults.headers = {
+    'Content-Type': 'application/json',
+    Authorization: access_token
+  
+}
 
 
-    // Axios.post(baseURL, data,{
-    // headers: {
-    //   Accept: "application/json",
-    //   "Content-Type": "application/json;charset=UTF-8",
-    // },
-    // })
-    // .then(({data}) => {
-    //     console.log(data);
-    // });
+
+let resp = await axios({
+  url: "http://10.103.1.203:8082/app/upload_images", 
+  data: [{datas,imagesData}],
+  method: 'post',
+  maxContentLength: 100000000,
+  maxBodyLength: 1000000000,
+  body: JSON.stringify(data)
+})
+ console.log("error", resp)
+  // .then((res) => {
+  //   console.log("Selamat", res);
+  // });
+
+ } catch (error) {
+  console.log(error)
+ }
+
+
+
+
+   
   };
-
+  
   return (
     <>
       <div className="row p-4 text-center">
@@ -521,28 +562,29 @@ console.log("ini", patientdataIdImages, ProfilePicture)
                     </select>
                   </div>
                 </div>
-                
-                
+
                 <Upload
-                  // value={patientdataIdImages[0]}
-             
-                 onChange={(e)=> uploadImage(e)}  img= {imagePreview}
+               
+
+                  onChange={(e) => uploadImage(e)}
+                  img={imagePreview} acccept="image/png/jpeg"
+
                 />
+
+
                 <UploadKTP
-                 
-                  onChange={(e)=> uploadImageKTP(e)} img= {imagePreview2}
+                  onChange={(e) => uploadImageKTP(e)}
+                  img={imagePreview2} acccept="image/png/jpeg"
                 />
-                {/* <Uploads value={patientdataIdImages[0]}
-                      onChange={changeIdImages}
-                      /> */}
-
-
+           
+           {/* <PostImage /> */}
                 <div className="d-grid gap-2 d-md-block mt-3">
                   <button
                     type="submit"
                     className="btn btn-primary"
                     onClick={submit}
                   >
+                  
                     Submit
                   </button>
                 </div>

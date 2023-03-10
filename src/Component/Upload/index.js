@@ -1,6 +1,7 @@
 import React from "react";
 import img1 from "../../images/idcard.png";
 
+
 // const [patientdataIdImages, setpatientdataIdImages] = useState("");
 // const [ProfilePicture, setProfilePicture] = useState("");
 
@@ -44,6 +45,7 @@ const Upload = ({img, ...rest}) => {
          
               </li>
               </ul>
+              
             </div>
             
           </div>
