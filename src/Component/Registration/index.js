@@ -32,8 +32,8 @@ const Registration = () => {
   const [image, setImage] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [imagePreview2, setImagePreview2] = useState(null);
-  const [imageString, setImageString]= useState(null);
-  
+  const [imageString, setImageString] = useState(null);
+  const [uploadImages, setuploadImages] = useState("");
 
   const changeCardNumber = (e) => {
     const value = e.target.value;
@@ -89,8 +89,6 @@ const Registration = () => {
     const value = e.target.value;
     setpatientPhoneNumber(value);
   };
-
- 
 
   const getProvince = () => {
     return patientProvince.map((province, Id) => {
@@ -151,40 +149,34 @@ const Registration = () => {
     setSelectedVillage(e.target.value);
   };
 
-  //pakenya yg ini
   const uploadImage = (e) => {
     const selectedImages = e.target.files[0];
-    let data ="";
+    let data = "";
     let reader = new FileReader();
 
     reader.readAsDataURL(selectedImages);
-    
+
     reader.onload = () => {
       setImagePreview(URL.createObjectURL(selectedImages));
       data = reader.result;
       setImageString(data);
-    
-   
-    }
-    
+    };
+
   };
 
   const uploadImageKTP = (e) => {
-    const selectedImage= e.target.files[0]
+    const selectedImage = e.target.files[0];
     setProfilePicture(selectedImage);
     setImagePreview2(URL.createObjectURL(selectedImage));
-    let data ="";
+    let data = "";
     let reader = new FileReader();
 
     reader.readAsDataURL(selectedImage);
-    
+
     reader.onload = () => {
-     
       data = reader.result;
       setImage(data);
-    
-   
-    }
+    };
   };
 
   useEffect(() => {
@@ -207,7 +199,6 @@ const Registration = () => {
       setProvince(response.data.Result);
     });
   };
-
 
   const handleCity = () => {
     const urlCity =
@@ -247,69 +238,62 @@ const Registration = () => {
 
   const submit = async (e) => {
     e.preventDefault();
-    const data = {
-      patientIDNumber: patientIDNumber,
-      patientName: patientName,
-      patientBirthPlace: patientBirthPlace,
-      patientBirthDate: patientBirthDate,
-      patientGender: patientGender,
-      MaritalStatus: MaritalStatus,
-      patientIdType: patientIdType,
-      patientEmail: patientEmail,
-      patientAddress: patientAddress,
-      patientPhoneNumber: patientPhoneNumber,
-      patientProvince: selectedProvince,
-      patientCity: selectedCity,
-      patientDistrict: selectedDistrict,
-      patientVillages: selectedVillage,
-      patientdataIdImages: patientdataIdImages,
-      ProfilePicture: ProfilePicture,
+    // const data = {
+    //   patientIDNumber: patientIDNumber,
+    //   patientName: patientName,
+    //   patientBirthPlace: patientBirthPlace,
+    //   patientBirthDate: patientBirthDate,
+    //   patientGender: patientGender,
+    //   MaritalStatus: MaritalStatus,
+    //   patientIdType: patientIdType,
+    //   patientEmail: patientEmail,
+    //   patientAddress: patientAddress,
+    //   patientPhoneNumber: patientPhoneNumber,
+    //   patientProvince: selectedProvince,
+    //   patientCity: selectedCity,
+    //   patientDistrict: selectedDistrict,
+    //   patientVillages: selectedVillage,
+    //   patientdataIdImages: patientdataIdImages,
+    //   ProfilePicture: ProfilePicture,
+    // };
+
+    let datas = {
+      ImageString: imageString,
+      FileType: "Profile Picture",
     };
 
-
- try {
-  let datas={
-    ImageString: imageString,
-    FileType: "Profile Picture"
-    }
-
-    let imagesData={
+    let imagesData = {
       ImageString: imageString,
-      FileType: "IDI KTP"
-      }
-  let access_token =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDc3IiwiVXNlcmNvZGUiOiJVU1ItMDAwMDAxMDkwIiwiVXNlck5hbWUiOiJkaW5kYS5heXVAaW5kb2xhYi5jb20iLCJSb2xlcyI6W3siUm9sZUlkIjoiMSIsIlJvbGVOYW1lIjoiVVNFUiIsIlJvbGVEZXNjcmlwdGlvbiI6IkRlZmF1bHQgVXNlciIsIkJyYW5jaElEIjoiYWxsIn0seyJSb2xlSWQiOiIzIiwiUm9sZU5hbWUiOiJDQVNISUVSIiwiUm9sZURlc2NyaXB0aW9uIjoiQ2FzaGllclx0IiwiQnJhbmNoSUQiOiJJTkRPTEFCLVBJIn0seyJSb2xlSWQiOiI2IiwiUm9sZU5hbWUiOiJTQSIsIlJvbGVEZXNjcmlwdGlvbiI6IlN1cGVyIEFkbWluaXN0cmF0b3IiLCJCcmFuY2hJRCI6ImFsbCJ9XSwiVXNlckRhdGEiOnsiVXNlcklkIjoiMTA3NyIsIlVzZXJDb2RlIjoiVVNSLTAwMDAwMTA5MCIsIlVzZXJOYW1lIjoiZGluZGEuYXl1QGluZG9sYWIuY29tIn19.kGf0chPaEevbKFdnib_0rcs32bXS5qujSHRuq4jRk5k";
-axios.defaults.headers = {
-    'Content-Type': 'application/json',
-    Authorization: access_token
-  
-}
+      FileType: "Id KTP",
+    };
+
+    
+    try {
+      // let access_token =
+      //   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDc3IiwiVXNlcmNvZGUiOiJVU1ItMDAwMDAxMDkwIiwiVXNlck5hbWUiOiJkaW5kYS5heXVAaW5kb2xhYi5jb20iLCJSb2xlcyI6W3siUm9sZUlkIjoiMSIsIlJvbGVOYW1lIjoiVVNFUiIsIlJvbGVEZXNjcmlwdGlvbiI6IkRlZmF1bHQgVXNlciIsIkJyYW5jaElEIjoiYWxsIn0seyJSb2xlSWQiOiIzIiwiUm9sZU5hbWUiOiJDQVNISUVSIiwiUm9sZURlc2NyaXB0aW9uIjoiQ2FzaGllclx0IiwiQnJhbmNoSUQiOiJJTkRPTEFCLVBJIn0seyJSb2xlSWQiOiI2IiwiUm9sZU5hbWUiOiJTQSIsIlJvbGVEZXNjcmlwdGlvbiI6IlN1cGVyIEFkbWluaXN0cmF0b3IiLCJCcmFuY2hJRCI6ImFsbCJ9XSwiVXNlckRhdGEiOnsiVXNlcklkIjoiMTA3NyIsIlVzZXJDb2RlIjoiVVNSLTAwMDAwMTA5MCIsIlVzZXJOYW1lIjoiZGluZGEuYXl1QGluZG9sYWIuY29tIn19.kGf0chPaEevbKFdnib_0rcs32bXS5qujSHRuq4jRk5k";
+      axios.defaults.headers = {
+        "Content-Type": "application/json",
+        // Authorization: access_token,
+      };
 
 
-
-let resp = await axios({
-  url: "http://10.103.1.203:8082/app/upload_images", 
-  data: [{datas,imagesData}],
-  method: 'post',
-  maxContentLength: 100000000,
-  maxBodyLength: 1000000000,
-  body: JSON.stringify(data)
-})
- console.log("error", resp)
-  // .then((res) => {
-  //   console.log("Selamat", res);
-  // });
-
- } catch (error) {
-  console.log(error)
- }
-
-
-
-
-   
+      let resp = await axios({
+        url: "http://10.103.1.203:8082/app/upload_images",
+        data: datas,
+        method: "post",
+        maxContentLength: 100000000,
+        maxBodyLength: 1000000000,
+        
+      });
+      console.log("error", resp);
+      // .then((res) => {
+      //   console.log("Selamat", res);
+      // });
+    } catch (error) {
+      console.log(error);
+    }
   };
-  
+
   return (
     <>
       <div className="row p-4 text-center">
@@ -564,28 +548,25 @@ let resp = await axios({
                 </div>
 
                 <Upload
-               
-
                   onChange={(e) => uploadImage(e)}
-                  img={imagePreview} acccept="image/png/jpeg"
-
+                  img={imagePreview}
+                  acccept="image/png/jpeg"
                 />
-
 
                 <UploadKTP
                   onChange={(e) => uploadImageKTP(e)}
-                  img={imagePreview2} acccept="image/png/jpeg"
+                  img={imagePreview2}
+                  acccept="image/png/jpeg"
                 />
-           
-           {/* <PostImage /> */}
+
+                {/* <PostImage /> */}
                 <div className="d-grid gap-2 d-md-block mt-3">
                   <button
                     type="submit"
                     className="btn btn-primary"
                     onClick={submit}
                   >
-                  
-                    Submit
+               Upload
                   </button>
                 </div>
               </form>
