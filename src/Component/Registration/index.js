@@ -149,22 +149,66 @@ const Registration = () => {
     setSelectedVillage(e.target.value);
   };
 
-  const uploadImage = (e) => {
+
+  let datas = {
+    ImageString: imageString,
+    FileType: "Profile Picture",
+  };
+
+  const uploadImageKTP = (e) => {
     const selectedImages = e.target.files[0];
     let data = "";
     let reader = new FileReader();
 
     reader.readAsDataURL(selectedImages);
 
-    reader.onload = () => {
+    reader.onload = async () => {
       setImagePreview(URL.createObjectURL(selectedImages));
       data = reader.result;
       setImageString(data);
     };
-
   };
 
-  const uploadImageKTP = (e) => {
+  let getData = {
+    ImageString: imageString,
+    FileType: "Id KTP",
+  };
+      
+
+  
+useEffect(()=>{
+  fethDatas()
+}, [getData])
+
+      const fethDatas = async ()=> {
+        try {
+      
+          axios.defaults.headers = {
+                 "Content-Type": "application/json",
+               };
+         
+         if(getData){
+           await axios({
+             url: "http://10.103.1.203:8082/app/upload_images",
+             data: getData,
+             method: "post",
+             maxContentLength: 100000000,
+             maxBodyLength: 1000000000,
+           }).then((response) => {
+             console.log(response.data);
+           });
+         
+         }       
+             } catch (error) {
+               console.log("Ini", error);
+             }
+       
+      }
+  
+
+ 
+
+  const uploadImageProfile = (e) => {
     const selectedImage = e.target.files[0];
     setProfilePicture(selectedImage);
     setImagePreview2(URL.createObjectURL(selectedImage));
@@ -238,60 +282,24 @@ const Registration = () => {
 
   const submit = async (e) => {
     e.preventDefault();
-    // const data = {
-    //   patientIDNumber: patientIDNumber,
-    //   patientName: patientName,
-    //   patientBirthPlace: patientBirthPlace,
-    //   patientBirthDate: patientBirthDate,
-    //   patientGender: patientGender,
-    //   MaritalStatus: MaritalStatus,
-    //   patientIdType: patientIdType,
-    //   patientEmail: patientEmail,
-    //   patientAddress: patientAddress,
-    //   patientPhoneNumber: patientPhoneNumber,
-    //   patientProvince: selectedProvince,
-    //   patientCity: selectedCity,
-    //   patientDistrict: selectedDistrict,
-    //   patientVillages: selectedVillage,
-    //   patientdataIdImages: patientdataIdImages,
-    //   ProfilePicture: ProfilePicture,
-    // };
-
-    let datas = {
-      ImageString: imageString,
-      FileType: "Profile Picture",
+    const data = {
+      patientIDNumber: patientIDNumber,
+      patientName: patientName,
+      patientBirthPlace: patientBirthPlace,
+      patientBirthDate: patientBirthDate,
+      patientGender: patientGender,
+      MaritalStatus: MaritalStatus,
+      patientIdType: patientIdType,
+      patientEmail: patientEmail,
+      patientAddress: patientAddress,
+      patientPhoneNumber: patientPhoneNumber,
+      patientProvince: selectedProvince,
+      patientCity: selectedCity,
+      patientDistrict: selectedDistrict,
+      patientVillages: selectedVillage,
+      patientdataIdImages: patientdataIdImages,
+      ProfilePicture: ProfilePicture,
     };
-
-    let imagesData = {
-      ImageString: imageString,
-      FileType: "Id KTP",
-    };
-
-    
-    try {
-      // let access_token =
-      //   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxMDc3IiwiVXNlcmNvZGUiOiJVU1ItMDAwMDAxMDkwIiwiVXNlck5hbWUiOiJkaW5kYS5heXVAaW5kb2xhYi5jb20iLCJSb2xlcyI6W3siUm9sZUlkIjoiMSIsIlJvbGVOYW1lIjoiVVNFUiIsIlJvbGVEZXNjcmlwdGlvbiI6IkRlZmF1bHQgVXNlciIsIkJyYW5jaElEIjoiYWxsIn0seyJSb2xlSWQiOiIzIiwiUm9sZU5hbWUiOiJDQVNISUVSIiwiUm9sZURlc2NyaXB0aW9uIjoiQ2FzaGllclx0IiwiQnJhbmNoSUQiOiJJTkRPTEFCLVBJIn0seyJSb2xlSWQiOiI2IiwiUm9sZU5hbWUiOiJTQSIsIlJvbGVEZXNjcmlwdGlvbiI6IlN1cGVyIEFkbWluaXN0cmF0b3IiLCJCcmFuY2hJRCI6ImFsbCJ9XSwiVXNlckRhdGEiOnsiVXNlcklkIjoiMTA3NyIsIlVzZXJDb2RlIjoiVVNSLTAwMDAwMTA5MCIsIlVzZXJOYW1lIjoiZGluZGEuYXl1QGluZG9sYWIuY29tIn19.kGf0chPaEevbKFdnib_0rcs32bXS5qujSHRuq4jRk5k";
-      axios.defaults.headers = {
-        "Content-Type": "application/json",
-        // Authorization: access_token,
-      };
-
-
-      let resp = await axios({
-        url: "http://10.103.1.203:8082/app/upload_images",
-        data: datas,
-        method: "post",
-        maxContentLength: 100000000,
-        maxBodyLength: 1000000000,
-        
-      });
-      console.log("error", resp);
-      // .then((res) => {
-      //   console.log("Selamat", res);
-      // });
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (
@@ -548,13 +556,13 @@ const Registration = () => {
                 </div>
 
                 <Upload
-                  onChange={(e) => uploadImage(e)}
+                  onChange={(e) => uploadImageKTP(e)}
                   img={imagePreview}
                   acccept="image/png/jpeg"
                 />
 
                 <UploadKTP
-                  onChange={(e) => uploadImageKTP(e)}
+                  onChange={(e) => uploadImageProfile(e)}
                   img={imagePreview2}
                   acccept="image/png/jpeg"
                 />
@@ -566,7 +574,7 @@ const Registration = () => {
                     className="btn btn-primary"
                     onClick={submit}
                   >
-               Upload
+                    Submit
                   </button>
                 </div>
               </form>
